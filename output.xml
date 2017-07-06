@@ -2,7 +2,6 @@
     <SMART_TABLE>
         <JOB JOBNAME="J9">
             <DESC>Hi I am Rohit</DESC>
-        <INCOND DESC="abc" NAME="J9-J11" />
         </JOB>
         <JOB JOBNAME="J10">
             <DESC>Hi I am Poonam</DESC>
@@ -10,8 +9,8 @@
         </JOB>
     <JOB JOBNAME="J11">
             <DESC>Hi I am Rahul</DESC>
-            <INCOND NAME="J11-J12" />
-            <OUTCOND NAME="J12-J11" />
+            <INCOND NAME="J10-J12" />
+            <OUTCOND NAME="J12-J10" />
         </JOB>
         </SMART_TABLE>
 </root>
