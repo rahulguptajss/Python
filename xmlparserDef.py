@@ -109,27 +109,15 @@ for old, new in old_new_dict.items():
             if jobOUT is not None and job.attrib['JOBNAME'] not in rightJobName:
                 if jobOUT.attrib['NAME'] is not None:
                     jobOUTList = jobOUT.attrib['NAME'].split('-')  # split string into a list
-                    newjobOUTList = []
-                    for w in jobOUTList:
-                        if w in old_new_dict.keys():
-                            newjobOUTList.append(old_new_dict.get(w))
-                        else:
-                            newjobOUTList.append(w)
-                    jobOUT.attrib['NAME'] = "-".join(newjobOUTList)
-
+                    jobOUTList = [w.replace(old, new) for w in jobOUTList]
+                    jobOUT.attrib['NAME'] = "-".join(jobOUTList)
         jobINAll = job.findall('INCOND')
         for jobIN in jobINAll:
             if jobIN != None and job.attrib['JOBNAME'] not in rightJobName:
                 if jobIN is not None and jobIN.attrib['NAME'] is not None:
                     jobINList = jobIN.attrib['NAME'].split('-')  # split string into a list
-                    newJobINList = []
-                    for w in jobINList:
-                        if w in old_new_dict.keys():
-                            newJobINList.append(old_new_dict.get(w))
-                        else:
-                            newJobINList.append(w)
-                    jobIN.attrib['NAME'] = "-".join(newJobINList)
-                    #print("replacede",jobIN.attrib['NAME'])
+                    jobINList = [w.replace(old, new) for w in jobINList]
+                    jobIN.attrib['NAME'] = "-".join(jobINList)
 
 mergedTree.write(input_destinationPath)
 
@@ -166,13 +154,8 @@ for remaining in allRemainingJob:
                             #print(intextList)
                         if jobIN.attrib['NAME'] not in intextList:
                             jobINList = jobIN.attrib['NAME'].split('-')  # split string into a list
-                            newJobINList = []
-                            for w in jobINList:
-                                if w in old_new_dict.keys():
-                                    newJobINList.append(old_new_dict.get(w))
-                                else:
-                                    newJobINList.append(w)
-                            jobIN.attrib['NAME'] = "-".join(newJobINList)
+                            jobINList = [w.replace(old, new) for w in jobINList]
+                            jobIN.attrib['NAME'] = "-".join(jobINList)
                             x.append(jobIN)
         jobOUTAll = job.findall('OUTCOND')
         for jobOUT in jobOUTAll:
@@ -188,14 +171,6 @@ for remaining in allRemainingJob:
                             intextList.append(xin.attrib['NAME'])
                             #print(intextList)
                         if jobOUT.attrib['NAME'] not in intextList:
-                            jobOUTList = jobOUT.attrib['NAME'].split('-')  # split string into a list
-                            newjobOUTList = []
-                            for w in jobOUTList:
-                                if w in old_new_dict.keys():
-                                    newjobOUTList.append(old_new_dict.get(w))
-                                else:
-                                    newjobOUTList.append(w)
-                            jobOUT.attrib['NAME'] = "-".join(newjobOUTList)
                             x.append(jobOUT)
 
 mergedTree.write(input_destinationPath)
