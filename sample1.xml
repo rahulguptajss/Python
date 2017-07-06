@@ -1,0 +1,20 @@
+<root>
+    <SMART_TABLE>
+        <JOB JOBNAME="J9">
+            <DESC>Hi I am Rohit</DESC>
+            <INCOND NAME="J9-J10" DESC="abc"/>
+        </JOB>
+        <JOB JOBNAME="J10">
+            <DESC>Hi I am Rahul</DESC>
+            <INCOND NAME="J10-J12"/>
+            <OUTCOND NAME="J12-J10"/>
+        </JOB>
+        <JOB JOBNAME="J11">
+            <DESC>Hi I am Deepesh</DESC>
+            <INCOND NAME="J11-J10"/>
+        </JOB>
+        <JOB JOBNAME="J12">
+            <DESC>Hi I am Ravi</DESC>
+        </JOB>
+    </SMART_TABLE>
+</root>
