@@ -1,15 +1,17 @@
 import xml.etree.ElementTree as ET
 import re
 import sys
+import csv
 
 from shutil import copyfile
 
 '''
-#first param: dev path
-#second param: prod path
-#third param: destination path
+#first param: dev path(xml)
+#second param: prod path(xml)
+#third param: destination path(xml)
 #fourth path: jobs to be merged
-#Sample Command: python xmlparser.py C:/Users/rgu107/Desktop/comp/sample1.xml C:/Users/rgu107/Desktop/comp/sample2.xml C:/Users/rgu107/Desktop/comp/output1.xml J10,J11
+#fifth param: output old->new mapping path (csv)
+#Sample Command: python xmlparser.py C:/Users/rgu107/Desktop/comp/sample1.xml C:/Users/rgu107/Desktop/comp/sample2.xml C:/Users/rgu107/Desktop/comp/output1.xml J10,J11 C:/Users/rgu107/Desktop/comp/mapping.csv
 '''
 
 # Ask for jobs to be merged
@@ -23,11 +25,12 @@ if len(sys.argv) == 1:
     input_mergeJob = input("Enter jobs to be merged (comma seprated): ")
     print("Jobs to be merged " + input_mergeJob)
     input_mergelist = input_mergeJob.split(',')
-elif len(sys.argv) ==5:
+elif len(sys.argv) ==6:
     input_devPath = sys.argv[1]
     input_prodPath = sys.argv[2]
     input_destinationPath = sys.argv[3]
     input_mergeJob = sys.argv[4]
+    input_mappingjob = sys.argv[5]
     print("Jobs to be merged " + input_mergeJob)
     input_mergelist = input_mergeJob.split(',')
 
@@ -199,3 +202,9 @@ for remaining in allRemainingJob:
                             x.append(jobOUT)
 
 mergedTree.write(input_destinationPath)
+
+
+#write dict map to file
+w = csv.writer(open(input_mappingjob, "w"))
+for key, val in old_new_dict.items():
+    w.writerow([key, val])
