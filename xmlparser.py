@@ -2,22 +2,23 @@ import xml.etree.ElementTree as ET
 import re
 import sys
 import csv
+from argparse import ArgumentParser
 
 from shutil import copyfile
 
-'''
-#first param: dev path(xml)
-#second param: prod path(xml)
-#third param: destination path(xml)
-#fourth path: jobs to be merged
-#fifth param: output old->new mapping path (csv)
-#Sample Command: python xmlparser.py C:/Users/rgu107/Desktop/comp/sample1.xml C:/Users/rgu107/Desktop/comp/sample2.xml C:/Users/rgu107/Desktop/comp/output1.xml J10,J11 C:/Users/rgu107/Desktop/comp/mapping.csv
-'''
+description = 'Merging dev to production jobs'
 
+parser = ArgumentParser(description=description)
+parser.add_argument('-i', '--item', action='store', dest='alist',
+                    type=str, nargs=5,
+                    help='-i <<dev path(xml)>> <<prod path(xml)>> <<destination path(xml)>> <<jobs to be merged>> <<output old->new mapping path(csv)>> [python xmlparser.py C:/Users/rgu107/Desktop/comp/sample1.xml C:/Users/rgu107/Desktop/comp/sample2.xml C:/Users/rgu107/Desktop/comp/output1.xml J10,J11 C:/Users/rgu107/Desktop/comp/mapping.csv]')
+opts = parser.parse_args()
+
+print("List of items: {}".format(opts.alist))
+results= opts.alist
 # Ask for jobs to be merged
-print('Number of arguments:', len(sys.argv), 'arguments.')
-print('Argument List:', str(sys.argv))
-
+#print('Argument List:', str(results))
+'''
 if len(sys.argv) == 1:
     input_devPath = input("Enter dev copy path: ")
     input_prodPath = input("Enter Prod copy path: ")
@@ -25,16 +26,16 @@ if len(sys.argv) == 1:
     input_mergeJob = input("Enter jobs to be merged (comma seprated): ")
     print("Jobs to be merged " + input_mergeJob)
     input_mergelist = input_mergeJob.split(',')
-elif len(sys.argv) ==6:
-    input_devPath = sys.argv[1]
-    input_prodPath = sys.argv[2]
-    input_destinationPath = sys.argv[3]
-    input_mergeJob = sys.argv[4]
-    input_mappingjob = sys.argv[5]
-    print("Jobs to be merged " + input_mergeJob)
-    input_mergelist = input_mergeJob.split(',')
-
-# parse left file
+    input_mappingjob = input("Enter output mapping: ")
+elif len(results) ==5:
+    '''
+input_devPath = results[0]
+input_prodPath = results[1]
+input_destinationPath = results[2]
+input_mergeJob = results[3]
+input_mappingjob = results[4]
+print("Jobs to be merged " + input_mergeJob)
+input_mergelist = input_mergeJob.split(',')  # parse left file
 leftJobName = []
 
 leftTree = ET.parse(input_devPath)
@@ -42,7 +43,7 @@ leftRoot = leftTree.getroot()
 for job in leftRoot.findall('SMART_TABLE/JOB'):
     leftJobName.append(job.attrib['JOBNAME'])
 
-#print('-----leftjobanme-----', leftJobName)
+# print('-----leftjobanme-----', leftJobName)
 
 # parse right file
 rightTree = ET.parse(input_prodPath)
@@ -51,7 +52,7 @@ rightJobName = []
 for job in rightRoot.findall('SMART_TABLE/JOB'):
     rightJobName.append(job.attrib['JOBNAME'])
 
-#print('--------rightjobname----', rightJobName)
+# print('--------rightjobname----', rightJobName)
 
 # print ("dup: ",set(input_mergelist) & set(rightJobName))
 # print("new: ", set(input_mergelist) - set(rightJobName))
@@ -132,14 +133,14 @@ for old, new in old_new_dict.items():
                         else:
                             newJobINList.append(w)
                     jobIN.attrib['NAME'] = "-".join(newJobINList)
-                    #print("replacede",jobIN.attrib['NAME'])
+                    # print("replacede",jobIN.attrib['NAME'])
 
 mergedTree.write(input_destinationPath)
 
 # add missing conditions for non migrated group
 
 
-#parse mergedroot
+# parse mergedroot
 mergeJobName = []
 
 mergedTree = ET.parse(input_destinationPath)
@@ -148,9 +149,9 @@ for job in mergedRoot.findall('SMART_TABLE/JOB'):
     mergeJobName.append(job.attrib['JOBNAME'])
 allRemainingJob = set(mergeJobName) & set(allProcessedJobs)
 
-#print("--------duplicate---", dupJob)
-#print("------allRemainingJob---", allRemainingJob)
-#print("------mergeJobName---", mergeJobName)
+# print("--------duplicate---", dupJob)
+# print("------allRemainingJob---", allRemainingJob)
+# print("------mergeJobName---", mergeJobName)
 for remaining in allRemainingJob:
     xpath = './/JOB[@JOBNAME="' + remaining + '"]'
     for job in leftRoot.findall(xpath):
@@ -159,14 +160,14 @@ for remaining in allRemainingJob:
             if jobIN is not None and jobIN.attrib['NAME'] is not None:
                 jobINList = jobIN.attrib['NAME'].split('-')  # split string into a list
                 commonInList = set(jobINList) & set(allProcessedJobs)
-                #print("commoninlist",commonInList)
+                # print("commoninlist",commonInList)
                 if commonInList:
                     xpath = './/JOB[@JOBNAME="' + job.attrib['JOBNAME'] + '"]'
                     for x in mergedRoot.findall(xpath):
                         intextList = []
                         for xin in x.findall('INCOND'):
                             intextList.append(xin.attrib['NAME'])
-                            #print(intextList)
+                            # print(intextList)
                         if jobIN.attrib['NAME'] not in intextList:
                             jobINList = jobIN.attrib['NAME'].split('-')  # split string into a list
                             newJobINList = []
@@ -182,14 +183,14 @@ for remaining in allRemainingJob:
             if jobOUT is not None and jobOUT.attrib['NAME'] is not None:
                 jobOUTList = jobOUT.attrib['NAME'].split('-')  # split string into a list
                 commonOUTList = set(jobOUTList) & set(allProcessedJobs)
-                #print("commonoutlist", commonOUTList)
+                # print("commonoutlist", commonOUTList)
                 if commonOUTList:
                     xpath = './/JOB[@JOBNAME="' + job.attrib['JOBNAME'] + '"]'
                     for x in mergedRoot.findall(xpath):
                         intextList = []
                         for xin in x.findall('OUTCOND'):
                             intextList.append(xin.attrib['NAME'])
-                            #print(intextList)
+                            # print(intextList)
                         if jobOUT.attrib['NAME'] not in intextList:
                             jobOUTList = jobOUT.attrib['NAME'].split('-')  # split string into a list
                             newjobOUTList = []
@@ -203,8 +204,7 @@ for remaining in allRemainingJob:
 
 mergedTree.write(input_destinationPath)
 
-
-#write dict map to file
+# write dict map to file
 w = csv.writer(open(input_mappingjob, "w"))
 for key, val in old_new_dict.items():
     w.writerow([key, val])

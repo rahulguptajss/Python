@@ -1,24 +1,10 @@
-import xml.etree.ElementTree as ET
+from argparse import ArgumentParser
 
-leftJobName = []
+description = 'testing for passing multiple arguments and to get list of args'
+parser = ArgumentParser(description=description)
+parser.add_argument('-i', '--item', action='store', dest='alist',
+                    type=str, nargs=5,
+                    help='-i <<dev path(xml)>> <<prod path(xml)>> <<destination path(xml)>> <<jobs to be merged>> <<output old->new mapping path(csv)>> [python xmlparser.py C:/Users/rgu107/Desktop/comp/sample1.xml C:/Users/rgu107/Desktop/comp/sample2.xml C:/Users/rgu107/Desktop/comp/output1.xml J10,J11 C:/Users/rgu107/Desktop/comp/mapping.csv]')
+opts = parser.parse_args()
 
-leftTree = ET.parse('sample1.xml')
-leftRoot = leftTree.getroot()
-#for job in leftRoot.findall('SMART_TABLE/JOB'):
-    #print(job.attrib['JOBNAME'])
-
-dupJob = ['J10']
-for jobName in dupJob:
-    xpath = './/JOB[@JOBNAME="'+jobName+'"]'
-    for job in leftRoot.findall(xpath):
-        # increment number
-        jobNameElement = job.attrib['JOBNAME']
-        print(jobNameElement)
-
-words = ['how', 'much', 'is[br]', 'the', 'fish[br]', 'no', 'really']
-
-words = [w.replace('[br]', '<br />') for w in words]
-
-print(words)
-
-
+print("List of items: {}".format(opts.alist))
