@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import xml.dom.minidom as XD
 import re
 import sys
 
@@ -109,15 +110,17 @@ for old, new in old_new_dict.items():
             if jobOUT is not None and job.attrib['JOBNAME'] not in rightJobName:
                 if jobOUT.attrib['NAME'] is not None:
                     jobOUTList = jobOUT.attrib['NAME'].split('-')  # split string into a list
-                    jobOUTList = [w.replace(old, new) for w in jobOUTList]
-                    jobOUT.attrib['NAME'] = "-".join(jobOUTList)
+                    for old, new in old_new_dict.items():
+                        jobOUTList = [w.replace(old, new) for w in jobOUTList]
+                        jobOUT.attrib['NAME'] = "-".join(jobOUTList)
         jobINAll = job.findall('INCOND')
         for jobIN in jobINAll:
             if jobIN != None and job.attrib['JOBNAME'] not in rightJobName:
                 if jobIN is not None and jobIN.attrib['NAME'] is not None:
                     jobINList = jobIN.attrib['NAME'].split('-')  # split string into a list
-                    jobINList = [w.replace(old, new) for w in jobINList]
-                    jobIN.attrib['NAME'] = "-".join(jobINList)
+                    for old, new in old_new_dict.items():
+                        jobINList = [w.replace(old, new) for w in jobINList]
+                        jobIN.attrib['NAME'] = "-".join(jobINList)
 
 mergedTree.write(input_destinationPath)
 
@@ -174,3 +177,28 @@ for remaining in allRemainingJob:
                             x.append(jobOUT)
 
 mergedTree.write(input_destinationPath)
+
+
+def prettify(input_destinationPath):
+    """
+        Return a pretty-printed XML string for the Element.
+    """
+    xml = XD.parse(input_destinationPath)  # or xml.dom.minidom.parseString(xml_string)
+    return xml.toprettyxml(indent=" ", newl='')
+
+
+def strip(elem):
+    for elem in elem.iter():
+        if (elem.text):
+            elem.text = elem.text.strip()
+        if (elem.tail):
+            elem.tail = elem.tail.strip()
+
+#pretty print
+pretty_xml_as_string = prettify(input_destinationPath)
+
+text_file = open(input_destinationPath, "w")
+text_file.write(pretty_xml_as_string)
+text_file.close()
+
+
