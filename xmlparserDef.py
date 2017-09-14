@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom as XD
 import re
 import sys
+import csv
 
 from shutil import copyfile
 
@@ -24,11 +25,12 @@ if len(sys.argv) == 1:
     input_mergeJob = input("Enter jobs to be merged (comma seprated): ")
     print("Jobs to be merged " + input_mergeJob)
     input_mergelist = input_mergeJob.split(',')
-elif len(sys.argv) ==5:
+elif len(sys.argv) ==6:
     input_devPath = sys.argv[1]
     input_prodPath = sys.argv[2]
     input_destinationPath = sys.argv[3]
     input_mergeJob = sys.argv[4]
+    input_mappingjob = sys.argv[5]
     print("Jobs to be merged " + input_mergeJob)
     input_mergelist = input_mergeJob.split(',')
 
@@ -136,9 +138,11 @@ for job in mergedRoot.findall('SMART_TABLE/JOB'):
     mergeJobName.append(job.attrib['JOBNAME'])
 allRemainingJob = set(mergeJobName) & set(allProcessedJobs)
 
-#print("--------duplicate---", dupJob)
-#print("------allRemainingJob---", allRemainingJob)
-#print("------mergeJobName---", mergeJobName)
+allRemainingJob = set(allRemainingJob) - set(newJob)
+
+print("--------allProcessedJobs---", allProcessedJobs)
+print("------allRemainingJob---", allRemainingJob)
+print("------mergeJobName---", mergeJobName)
 for remaining in allRemainingJob:
     xpath = './/JOB[@JOBNAME="' + remaining + '"]'
     for job in leftRoot.findall(xpath):
@@ -178,27 +182,17 @@ for remaining in allRemainingJob:
 
 mergedTree.write(input_destinationPath)
 
-
-def prettify(input_destinationPath):
-    """
-        Return a pretty-printed XML string for the Element.
-    """
-    xml = XD.parse(input_destinationPath)  # or xml.dom.minidom.parseString(xml_string)
-    return xml.toprettyxml(indent=" ", newl='')
+# write dict map to file
 
 
-def strip(elem):
-    for elem in elem.iter():
-        if (elem.text):
-            elem.text = elem.text.strip()
-        if (elem.tail):
-            elem.tail = elem.tail.strip()
-
-#pretty print
-pretty_xml_as_string = prettify(input_destinationPath)
-
-text_file = open(input_destinationPath, "w")
-text_file.write(pretty_xml_as_string)
-text_file.close()
-
-
+w = csv.writer(open(input_mappingjob, "w"))
+for key, val in old_new_dict.items():
+    with open(input_devPath) as f:
+        keycount = 0
+        for line in f:
+            keycount += line.count(key)
+    with open(input_destinationPath) as f:
+        valuecount = 0
+        for line in f:
+            valuecount += line.count(val)
+    w.writerow([key, val,keycount,valuecount])
