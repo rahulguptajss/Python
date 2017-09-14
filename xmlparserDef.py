@@ -140,9 +140,10 @@ allRemainingJob = set(mergeJobName) & set(allProcessedJobs)
 
 allRemainingJob = set(allRemainingJob) - set(newJob)
 
-print("--------allProcessedJobs---", allProcessedJobs)
+#print("--------allProcessedJobs---", allProcessedJobs)
 print("------allRemainingJob---", allRemainingJob)
-print("------mergeJobName---", mergeJobName)
+#print("------mergeJobName---", mergeJobName)
+
 for remaining in allRemainingJob:
     xpath = './/JOB[@JOBNAME="' + remaining + '"]'
     for job in leftRoot.findall(xpath):
@@ -158,10 +159,10 @@ for remaining in allRemainingJob:
                         intextList = []
                         for xin in x.findall('INCOND'):
                             intextList.append(xin.attrib['NAME'])
-                            #print(intextList)
                         if jobIN.attrib['NAME'] not in intextList:
                             jobINList = jobIN.attrib['NAME'].split('-')  # split string into a list
-                            jobINList = [w.replace(old, new) for w in jobINList]
+                            for old, new in old_new_dict.items():
+                                jobINList = [w.replace(old, new) for w in jobINList]
                             jobIN.attrib['NAME'] = "-".join(jobINList)
                             x.append(jobIN)
         jobOUTAll = job.findall('OUTCOND')
@@ -176,8 +177,12 @@ for remaining in allRemainingJob:
                         intextList = []
                         for xin in x.findall('OUTCOND'):
                             intextList.append(xin.attrib['NAME'])
-                            #print(intextList)
+                            print(intextList)
                         if jobOUT.attrib['NAME'] not in intextList:
+                            jobOUTList = jobOUT.attrib['NAME'].split('-')  # split string into a list
+                            for old, new in old_new_dict.items():
+                                jobOUTList = [w.replace(old, new) for w in jobOUTList]
+                            jobOUT.attrib['NAME'] = "-".join(jobOUTList)
                             x.append(jobOUT)
 
 mergedTree.write(input_destinationPath)
