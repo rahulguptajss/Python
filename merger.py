@@ -21,8 +21,10 @@ def run(files):
 
 
 def main():
-    print("hello world!")
-    run("C:\\Users\\rgu107\\Desktop\\merge\\")
+    print('Number of arguments:', len(sys.argv), 'arguments.')
+    print('Argument List:', str(sys.argv))
+    input_devPath = sys.argv[1]
+    run(input_devPath)
 
 if __name__== "__main__":
   main()
